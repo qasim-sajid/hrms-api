@@ -9,7 +9,7 @@ import (
 
 	_ "github.com/lib/pq"
 	"github.com/qasim-sajid/hrms-api/conf"
-	"github.com/qasim-sajid/hrms-api/models"
+	"github.com/qasim-sajid/hrms-api/domain"
 )
 
 type dbClient struct {
@@ -95,7 +95,7 @@ func (db *dbClient) GetInsertQuery(structType interface{}) (string, error) {
 	query := ``
 	switch reflect.TypeOf(structType).Name() {
 	case "Employee":
-		employee := structType.(models.Employee)
+		employee := structType.(domain.Employee)
 		query = fmt.Sprintf(`INSERT INTO %s (%s) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%v', '%v'`,
 			tableName, db.GetColumnNamesForStruct(employee), employee.Username, employee.Email, employee.Password,
 			employee.Name, employee.PhoneNumber, employee.Address, employee.EmployeeType, employee.CreatedAt.Format(conf.TIME_LAYOUT),
@@ -106,19 +106,19 @@ func (db *dbClient) GetInsertQuery(structType interface{}) (string, error) {
 			query = fmt.Sprintf(`%s, %v)`, query, "null")
 		}
 	case "Contract":
-		contract := structType.(models.Contract)
+		contract := structType.(domain.Contract)
 		query = fmt.Sprintf(`INSERT INTO %s (%s) VALUES ('%v', '%v', %f, %f, '%v', '%v', %d)`,
 			tableName, db.GetColumnNamesForStruct(contract), contract.StartDate.Format(conf.TIME_LAYOUT),
 			contract.EndDate.Format(conf.TIME_LAYOUT), contract.BasicPay, contract.TotalPto,
 			contract.CreatedAt.Format(conf.TIME_LAYOUT), contract.UpdatedAt.Format(conf.TIME_LAYOUT), contract.EmployeeID)
 	case "Transaction":
-		transaction := structType.(models.Transaction)
+		transaction := structType.(domain.Transaction)
 		query = fmt.Sprintf(`INSERT INTO %s (%s) VALUES ('%v', %f, %f, '%v', '%v', %d)`,
 			tableName, db.GetColumnNamesForStruct(transaction), transaction.TransactionDate.Format(conf.TIME_LAYOUT),
 			transaction.PaidAmount, transaction.AvailedPto, transaction.CreatedAt.Format(conf.TIME_LAYOUT),
 			transaction.UpdatedAt.Format(conf.TIME_LAYOUT), transaction.ContractId)
 	case "Request":
-		request := structType.(models.Request)
+		request := structType.(domain.Request)
 		query = fmt.Sprintf(`INSERT INTO %s (%s) VALUES ('%v', '%v', '%v', %t, '%v', '%v', %d)`,
 			tableName, db.GetColumnNamesForStruct(request), request.StartDate.Format(conf.TIME_LAYOUT),
 			request.EndDate.Format(conf.TIME_LAYOUT), request.ActionAt.Format(conf.TIME_LAYOUT), request.IsApproved,

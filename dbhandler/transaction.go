@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/qasim-sajid/hrms-api/models"
+	"github.com/qasim-sajid/hrms-api/domain"
 )
 
-func (db *dbClient) AddTransaction(transaction *models.Transaction) (*models.Transaction, int, error) {
+func (db *dbClient) AddTransaction(transaction *domain.Transaction) (*domain.Transaction, int, error) {
 	insertQuery, err := db.GetInsertQuery(*transaction)
 	if err != nil {
 		return nil, -1, fmt.Errorf("AddTransaction: %v", err)
@@ -23,7 +23,7 @@ func (db *dbClient) AddTransaction(transaction *models.Transaction) (*models.Tra
 	return transaction, http.StatusOK, nil
 }
 
-func (db *dbClient) GetAllTransactions() ([]*models.Transaction, error) {
+func (db *dbClient) GetAllTransactions() ([]*domain.Transaction, error) {
 	transactions, err := db.GetTransactionsWithFilters(make(map[string]interface{}))
 	if err != nil {
 		return nil, fmt.Errorf("GetAllTransactions: %v", err)
@@ -32,7 +32,7 @@ func (db *dbClient) GetAllTransactions() ([]*models.Transaction, error) {
 	return transactions, nil
 }
 
-func (db *dbClient) GetTransaction(transactionID int64) (*models.Transaction, error) {
+func (db *dbClient) GetTransaction(transactionID int64) (*domain.Transaction, error) {
 	selectParams := make(map[string]interface{})
 
 	selectParams["transaction_id"] = transactionID
@@ -42,7 +42,7 @@ func (db *dbClient) GetTransaction(transactionID int64) (*models.Transaction, er
 		return nil, fmt.Errorf("GetTransaction: %v", err)
 	}
 
-	var transaction *models.Transaction
+	var transaction *domain.Transaction
 	if transactions == nil || len(transactions) <= 0 {
 		return nil, fmt.Errorf("GetTransaction: %v", errors.New("transaction with given id not found"))
 	} else {
@@ -52,8 +52,8 @@ func (db *dbClient) GetTransaction(transactionID int64) (*models.Transaction, er
 	return transaction, nil
 }
 
-func (db *dbClient) GetTransactionsWithFilters(searchParams map[string]interface{}) ([]*models.Transaction, error) {
-	p := models.Transaction{}
+func (db *dbClient) GetTransactionsWithFilters(searchParams map[string]interface{}) ([]*domain.Transaction, error) {
+	p := domain.Transaction{}
 
 	selectQuery, err := db.GetSelectQueryForStruct(p, searchParams)
 	if err != nil {
@@ -65,7 +65,7 @@ func (db *dbClient) GetTransactionsWithFilters(searchParams map[string]interface
 		return nil, fmt.Errorf("GetTransactionsWithFilters: %v", err)
 	}
 
-	transactions, err := db.GetTransactionsFromRows(rows)
+	transactions, err := GetTransactionsFromRows(rows)
 	if err != nil {
 		return nil, fmt.Errorf("GetTransactionsWithFilters: %v", err)
 	}
@@ -73,10 +73,10 @@ func (db *dbClient) GetTransactionsWithFilters(searchParams map[string]interface
 	return transactions, nil
 }
 
-func (db *dbClient) GetTransactionsFromRows(rows *sql.Rows) ([]*models.Transaction, error) {
-	transactions := make([]*models.Transaction, 0)
+func GetTransactionsFromRows(rows *sql.Rows) ([]*domain.Transaction, error) {
+	transactions := make([]*domain.Transaction, 0)
 	for rows.Next() {
-		c := models.Transaction{}
+		c := domain.Transaction{}
 
 		err := rows.Scan(&c.TransactionId, &c.ContractId, &c.TransactionDate, &c.PaidAmount,
 			&c.AvailedPto, &c.CreatedAt, &c.UpdatedAt)
@@ -91,8 +91,8 @@ func (db *dbClient) GetTransactionsFromRows(rows *sql.Rows) ([]*models.Transacti
 	return transactions, nil
 }
 
-func (db *dbClient) UpdateTransaction(transactionID int64, updates map[string]interface{}) (*models.Transaction, error) {
-	updateQuery, err := db.GetUpdateQueryForStruct(models.Transaction{}, transactionID, updates)
+func (db *dbClient) UpdateTransaction(transactionID int64, updates map[string]interface{}) (*domain.Transaction, error) {
+	updateQuery, err := db.GetUpdateQueryForStruct(domain.Transaction{}, transactionID, updates)
 	if err != nil {
 		return nil, fmt.Errorf("UpdateTransaction: %v", err)
 	}
@@ -117,7 +117,7 @@ func (db *dbClient) DeleteTransaction(transactionID int64) error {
 
 	deleteParams["transaction_id"] = transactionID
 
-	deleteQuery, err := db.GetDeleteQueryForStruct(models.Transaction{}, deleteParams)
+	deleteQuery, err := db.GetDeleteQueryForStruct(domain.Transaction{}, deleteParams)
 	if err != nil {
 		return fmt.Errorf("DeleteTransaction: %v", err)
 	}

@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/qasim-sajid/hrms-api/models"
+	"github.com/qasim-sajid/hrms-api/domain"
 )
 
-func (db *dbClient) AddEmployee(Employee *models.Employee) (*models.Employee, int, error) {
+func (db *dbClient) AddEmployee(Employee *domain.Employee) (*domain.Employee, int, error) {
 	if status, err := db.CheckForDuplicateEmployee(Employee.Email); err != nil {
 		return nil, status, fmt.Errorf("AddEmployee: %v", err)
 	}
@@ -32,7 +32,7 @@ func (db *dbClient) AddEmployee(Employee *models.Employee) (*models.Employee, in
 	return Employee, http.StatusOK, nil
 }
 
-func (db *dbClient) GetAllEmployees() ([]*models.Employee, error) {
+func (db *dbClient) GetAllEmployees() ([]*domain.Employee, error) {
 	Employees, err := db.GetEmployeesWithFilters(make(map[string]interface{}))
 	if err != nil {
 		return nil, fmt.Errorf("GetAllEmployees: %v", err)
@@ -41,7 +41,7 @@ func (db *dbClient) GetAllEmployees() ([]*models.Employee, error) {
 	return Employees, nil
 }
 
-func (db *dbClient) GetEmployee(EmployeeID int64) (*models.Employee, error) {
+func (db *dbClient) GetEmployee(EmployeeID int64) (*domain.Employee, error) {
 	selectParams := make(map[string]interface{})
 
 	selectParams["employee_id"] = EmployeeID
@@ -51,7 +51,7 @@ func (db *dbClient) GetEmployee(EmployeeID int64) (*models.Employee, error) {
 		return nil, fmt.Errorf("GetEmployee: %v", err)
 	}
 
-	var Employee *models.Employee
+	var Employee *domain.Employee
 	if Employees == nil || len(Employees) <= 0 {
 		return nil, nil //fmt.Errorf("GetEmployee: %v", errors.New("Employee with given ID not found!"))
 	} else {
@@ -61,7 +61,7 @@ func (db *dbClient) GetEmployee(EmployeeID int64) (*models.Employee, error) {
 	return Employee, nil
 }
 
-func (db *dbClient) GetEmployeeWithIdentity(identity string) (*models.Employee, error) {
+func (db *dbClient) GetEmployeeWithIdentity(identity string) (*domain.Employee, error) {
 	searchParams := make(map[string]interface{})
 	if strings.Contains(identity, "@") {
 		searchParams["email"] = identity
@@ -74,7 +74,7 @@ func (db *dbClient) GetEmployeeWithIdentity(identity string) (*models.Employee, 
 		return nil, fmt.Errorf("GetEmployee: %v", err)
 	}
 
-	var Employee *models.Employee
+	var Employee *domain.Employee
 	if Employees == nil || len(Employees) <= 0 {
 		return nil, nil //fmt.Errorf("GetEmployee: %v", errors.New("Employee with given ID not found!"))
 	} else {
@@ -84,8 +84,8 @@ func (db *dbClient) GetEmployeeWithIdentity(identity string) (*models.Employee, 
 	return Employee, nil
 }
 
-func (db *dbClient) GetEmployeesWithFilters(searchParams map[string]interface{}) ([]*models.Employee, error) {
-	p := models.Employee{}
+func (db *dbClient) GetEmployeesWithFilters(searchParams map[string]interface{}) ([]*domain.Employee, error) {
+	p := domain.Employee{}
 
 	selectQuery, err := db.GetSelectQueryForStruct(p, searchParams)
 	if err != nil {
@@ -97,7 +97,7 @@ func (db *dbClient) GetEmployeesWithFilters(searchParams map[string]interface{})
 		return nil, fmt.Errorf("GetEmployeesWithFilters: %v", err)
 	}
 
-	Employees, err := db.GetEmployeesFromRows(rows)
+	Employees, err := GetEmployeesFromRows(rows)
 	if err != nil {
 		return nil, fmt.Errorf("GetEmployeesWithFilters: %v", err)
 	}
@@ -105,10 +105,10 @@ func (db *dbClient) GetEmployeesWithFilters(searchParams map[string]interface{})
 	return Employees, nil
 }
 
-func (db *dbClient) GetEmployeesFromRows(rows *sql.Rows) ([]*models.Employee, error) {
-	Employees := make([]*models.Employee, 0)
+func GetEmployeesFromRows(rows *sql.Rows) ([]*domain.Employee, error) {
+	Employees := make([]*domain.Employee, 0)
 	for rows.Next() {
-		e := models.Employee{}
+		e := domain.Employee{}
 
 		var managerID sql.NullInt64
 
@@ -129,8 +129,8 @@ func (db *dbClient) GetEmployeesFromRows(rows *sql.Rows) ([]*models.Employee, er
 	return Employees, nil
 }
 
-func (db *dbClient) UpdateEmployee(EmployeeID int64, updates map[string]interface{}) (*models.Employee, error) {
-	updateQuery, err := db.GetUpdateQueryForStruct(models.Employee{}, EmployeeID, updates)
+func (db *dbClient) UpdateEmployee(EmployeeID int64, updates map[string]interface{}) (*domain.Employee, error) {
+	updateQuery, err := db.GetUpdateQueryForStruct(domain.Employee{}, EmployeeID, updates)
 	if err != nil {
 		return nil, fmt.Errorf("UpdateEmployee: %v", err)
 	}
@@ -155,7 +155,7 @@ func (db *dbClient) DeleteEmployee(EmployeeID int64) error {
 
 	deleteParams["employee_id"] = EmployeeID
 
-	deleteQuery, err := db.GetDeleteQueryForStruct(models.Employee{}, deleteParams)
+	deleteQuery, err := db.GetDeleteQueryForStruct(domain.Employee{}, deleteParams)
 	if err != nil {
 		return fmt.Errorf("DeleteEmployee: %v", err)
 	}
@@ -190,7 +190,7 @@ func (db *dbClient) CheckForDuplicateEmployee(identity string) (int, error) {
 	return http.StatusOK, nil
 }
 
-func (db *dbClient) CheckEmployeeLogin(identity, password string) (*models.Employee, error) {
+func (db *dbClient) CheckEmployeeLogin(identity, password string) (*domain.Employee, error) {
 	Employee, err := db.GetEmployeeWithIdentity(identity)
 	if err != nil {
 		return nil, err

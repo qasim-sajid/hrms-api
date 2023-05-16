@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/qasim-sajid/hrms-api/models"
+	"github.com/qasim-sajid/hrms-api/domain"
 )
 
-func (db *dbClient) AddRequest(request *models.Request) (*models.Request, int, error) {
+func (db *dbClient) AddRequest(request *domain.Request) (*domain.Request, int, error) {
 	insertQuery, err := db.GetInsertQuery(*request)
 	if err != nil {
 		return nil, -1, fmt.Errorf("AddRequest: %v", err)
@@ -23,7 +23,7 @@ func (db *dbClient) AddRequest(request *models.Request) (*models.Request, int, e
 	return request, http.StatusOK, nil
 }
 
-func (db *dbClient) GetAllRequests() ([]*models.Request, error) {
+func (db *dbClient) GetAllRequests() ([]*domain.Request, error) {
 	requests, err := db.GetRequestsWithFilters(make(map[string]interface{}))
 	if err != nil {
 		return nil, fmt.Errorf("GetAllRequests: %v", err)
@@ -32,7 +32,7 @@ func (db *dbClient) GetAllRequests() ([]*models.Request, error) {
 	return requests, nil
 }
 
-func (db *dbClient) GetRequest(requestID int64) (*models.Request, error) {
+func (db *dbClient) GetRequest(requestID int64) (*domain.Request, error) {
 	selectParams := make(map[string]interface{})
 
 	selectParams["request_id"] = requestID
@@ -42,7 +42,7 @@ func (db *dbClient) GetRequest(requestID int64) (*models.Request, error) {
 		return nil, fmt.Errorf("GetRequest: %v", err)
 	}
 
-	var request *models.Request
+	var request *domain.Request
 	if requests == nil || len(requests) <= 0 {
 		return nil, fmt.Errorf("GetRequest: %v", errors.New("request with given id not found"))
 	} else {
@@ -52,8 +52,8 @@ func (db *dbClient) GetRequest(requestID int64) (*models.Request, error) {
 	return request, nil
 }
 
-func (db *dbClient) GetRequestsWithFilters(searchParams map[string]interface{}) ([]*models.Request, error) {
-	p := models.Request{}
+func (db *dbClient) GetRequestsWithFilters(searchParams map[string]interface{}) ([]*domain.Request, error) {
+	p := domain.Request{}
 
 	selectQuery, err := db.GetSelectQueryForStruct(p, searchParams)
 	if err != nil {
@@ -65,7 +65,7 @@ func (db *dbClient) GetRequestsWithFilters(searchParams map[string]interface{}) 
 		return nil, fmt.Errorf("GetRequestsWithFilters: %v", err)
 	}
 
-	requests, err := db.GetRequestsFromRows(rows)
+	requests, err := GetRequestsFromRows(rows)
 	if err != nil {
 		return nil, fmt.Errorf("GetRequestsWithFilters: %v", err)
 	}
@@ -73,10 +73,10 @@ func (db *dbClient) GetRequestsWithFilters(searchParams map[string]interface{}) 
 	return requests, nil
 }
 
-func (db *dbClient) GetRequestsFromRows(rows *sql.Rows) ([]*models.Request, error) {
-	requests := make([]*models.Request, 0)
+func GetRequestsFromRows(rows *sql.Rows) ([]*domain.Request, error) {
+	requests := make([]*domain.Request, 0)
 	for rows.Next() {
-		c := models.Request{}
+		c := domain.Request{}
 
 		err := rows.Scan(&c.RequestId, &c.EmployeeID, &c.StartDate, &c.EndDate, &c.ActionAt,
 			&c.IsApproved, &c.CreatedAt, &c.UpdatedAt)
@@ -91,8 +91,8 @@ func (db *dbClient) GetRequestsFromRows(rows *sql.Rows) ([]*models.Request, erro
 	return requests, nil
 }
 
-func (db *dbClient) UpdateRequest(requestID int64, updates map[string]interface{}) (*models.Request, error) {
-	updateQuery, err := db.GetUpdateQueryForStruct(models.Request{}, requestID, updates)
+func (db *dbClient) UpdateRequest(requestID int64, updates map[string]interface{}) (*domain.Request, error) {
+	updateQuery, err := db.GetUpdateQueryForStruct(domain.Request{}, requestID, updates)
 	if err != nil {
 		return nil, fmt.Errorf("UpdateRequest: %v", err)
 	}
@@ -117,7 +117,7 @@ func (db *dbClient) DeleteRequest(requestID int64) error {
 
 	deleteParams["request_id"] = requestID
 
-	deleteQuery, err := db.GetDeleteQueryForStruct(models.Request{}, deleteParams)
+	deleteQuery, err := db.GetDeleteQueryForStruct(domain.Request{}, deleteParams)
 	if err != nil {
 		return fmt.Errorf("DeleteRequest: %v", err)
 	}

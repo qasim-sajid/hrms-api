@@ -1,39 +1,39 @@
 package dbhandler
 
-import "github.com/qasim-sajid/hrms-api/models"
+import "github.com/qasim-sajid/hrms-api/domain"
 
 // DbHandler specifies DB context
 type DbHandler interface {
 	SetupDB()
 	CloseDB()
 
-	AddEmployee(*models.Employee) (*models.Employee, int, error)
-	GetAllEmployees() ([]*models.Employee, error)
-	GetEmployeesWithFilters(searchParams map[string]interface{}) ([]*models.Employee, error)
-	GetEmployee(userID int64) (*models.Employee, error)
-	GetEmployeeWithIdentity(identity string) (*models.Employee, error)
-	UpdateEmployee(userID int64, updates map[string]interface{}) (*models.Employee, error)
+	AddEmployee(*domain.Employee) (*domain.Employee, int, error)
+	GetAllEmployees() ([]*domain.Employee, error)
+	GetEmployeesWithFilters(searchParams map[string]interface{}) ([]*domain.Employee, error)
+	GetEmployee(userID int64) (*domain.Employee, error)
+	GetEmployeeWithIdentity(identity string) (*domain.Employee, error)
+	UpdateEmployee(userID int64, updates map[string]interface{}) (*domain.Employee, error)
 	DeleteEmployee(userID int64) error
-	CheckEmployeeLogin(string, string) (*models.Employee, error)
+	CheckEmployeeLogin(string, string) (*domain.Employee, error)
 
-	AddContract(*models.Contract) (*models.Contract, int, error)
-	GetAllContracts() ([]*models.Contract, error)
-	GetContractsWithFilters(searchParams map[string]interface{}) ([]*models.Contract, error)
-	GetContract(contractID int64) (*models.Contract, error)
-	UpdateContract(contractID int64, updates map[string]interface{}) (*models.Contract, error)
+	AddContract(*domain.Contract) (*domain.Contract, int, error)
+	GetAllContracts() ([]*domain.Contract, error)
+	GetContractsWithFilters(searchParams map[string]interface{}) ([]*domain.Contract, error)
+	GetContract(contractID int64) (*domain.Contract, error)
+	UpdateContract(contractID int64, updates map[string]interface{}) (*domain.Contract, error)
 	DeleteContract(contractID int64) error
 
-	AddTransaction(*models.Transaction) (*models.Transaction, int, error)
-	GetAllTransactions() ([]*models.Transaction, error)
-	GetTransactionsWithFilters(searchParams map[string]interface{}) ([]*models.Transaction, error)
-	GetTransaction(transactionID int64) (*models.Transaction, error)
-	UpdateTransaction(transactionID int64, updates map[string]interface{}) (*models.Transaction, error)
+	AddTransaction(*domain.Transaction) (*domain.Transaction, int, error)
+	GetAllTransactions() ([]*domain.Transaction, error)
+	GetTransactionsWithFilters(searchParams map[string]interface{}) ([]*domain.Transaction, error)
+	GetTransaction(transactionID int64) (*domain.Transaction, error)
+	UpdateTransaction(transactionID int64, updates map[string]interface{}) (*domain.Transaction, error)
 	DeleteTransaction(transactionID int64) error
 
-	AddRequest(*models.Request) (*models.Request, int, error)
-	GetAllRequests() ([]*models.Request, error)
-	GetRequestsWithFilters(searchParams map[string]interface{}) ([]*models.Request, error)
-	GetRequest(requestID int64) (*models.Request, error)
-	UpdateRequest(requestID int64, updates map[string]interface{}) (*models.Request, error)
+	AddRequest(*domain.Request) (*domain.Request, int, error)
+	GetAllRequests() ([]*domain.Request, error)
+	GetRequestsWithFilters(searchParams map[string]interface{}) ([]*domain.Request, error)
+	GetRequest(requestID int64) (*domain.Request, error)
+	UpdateRequest(requestID int64, updates map[string]interface{}) (*domain.Request, error)
 	DeleteRequest(requestID int64) error
 }

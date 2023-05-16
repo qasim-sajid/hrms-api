@@ -2,11 +2,9 @@ package main
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/qasim-sajid/hrms-api/conf"
 	"github.com/qasim-sajid/hrms-api/dbhandler"
-	"github.com/qasim-sajid/hrms-api/models"
 )
 
 // Main function
@@ -66,19 +64,28 @@ func main() {
 	// 	panic(err)
 	// }
 
-	request := models.Request{}
-	request.StartDate = time.Now()
-	request.EndDate = time.Now()
-	request.ActionAt = time.Now()
-	request.IsApproved = false
-	request.EmployeeID = 1
-	request.CreatedAt = time.Now()
-	request.UpdatedAt = time.Now()
+	// request := models.Request{}
+	// request.StartDate = time.Now()
+	// request.EndDate = time.Now()
+	// request.ActionAt = time.Now()
+	// request.IsApproved = false
+	// request.EmployeeID = 1
+	// request.CreatedAt = time.Now()
+	// request.UpdatedAt = time.Now()
 
-	_, status, err := dbC.AddRequest(&request)
+	// _, status, err := dbC.AddRequest(&request)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	employees, err := dbC.GetAllEmployees()
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("Status: ", status)
+	for _, e := range employees {
+		fmt.Println("Employees: ", e.Name)
+	}
+
+	// fmt.Println("Status: ", status)
 }
